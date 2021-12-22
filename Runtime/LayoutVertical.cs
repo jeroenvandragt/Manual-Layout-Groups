@@ -5,14 +5,14 @@ using System.Collections.Generic;
 namespace EasySee.UI
 {
     [AddComponentMenu("Layout/EasySee/ManualVerticalLayout")]
+	[ExecuteInEditMode]
     public class LayoutVertical : MonoBehaviour
     {
-        [SerializeField]
-        List<RectTransform> children;
-        RectTransform transform;
+         List<RectTransform> children;
+        RectTransform m_Transform;
 
         [SerializeField]
-        Vector2 childSize = new Vector2();
+        Vector2 childSize = new Vector2( );
 
         [SerializeField]
         float padding = 0;
@@ -20,47 +20,60 @@ namespace EasySee.UI
         [SerializeField]
         bool adjustSizeToContent = false;
 
+        public bool updateOnChildChange = true;
+
 
         RectTransform.Edge edgeToSnap = RectTransform.Edge.Top;
 
-        void Start()
+        public void Start ( )
         {
-            transform = GetComponent<RectTransform>();
-            GetRectAndCalculate();
+            m_Transform = GetComponent<RectTransform>( );
+            GetRectAndCalculate( );
         }
-
+        /// <summary>
+        /// Callback for when the amount of children has changed
+        /// </summary>
+        private void OnTransformChildrenChanged ( )
+        {
+            if(updateOnChildChange)
+            {
+                GetChildrenRects( );
+                Invoke( "CalculatePosition", 0.1f );
+            }
+        }
 
         /// <summary>
         /// Called to get all the children in the list and refresh the position of the children.
         /// </summary>
-        public void GetRectAndCalculate() 
+        public void GetRectAndCalculate ( )
         {
-            GetChildrenRects();
-            CalculatePosition();
+            GetChildrenRects( );
+            CalculatePosition( );
         }
 
         /// <summary>
         /// Called to collect all the children in the list.
         /// </summary>
-        public void GetChildrenRects()
+        public void GetChildrenRects ( )
         {
             if (children == null)
             {
-                children = new List<RectTransform>();
+                children = new List<RectTransform>( );
             }
             if (children.Count > 0)
             {
-                children.Clear();
+                children.Clear( );
             }
-            if (transform == null)
+            if (m_Transform == null)
             {
-                Debug.Log("Parent transform is null.");
+                m_Transform = GetComponent<RectTransform>( );
+                Debug.Log( "Parent transform is null. Did you try to add this to a non-UI object?", gameObject.transform );
             }
             else
             {
-                for (int i = 0; i < transform.childCount; i++)
+                for (int i = 0; i < m_Transform.childCount; i++)
                 {
-                    children.Add(transform.GetChild(i).GetComponent<RectTransform>());
+                    children.Add( m_Transform.GetChild( i ).GetComponent<RectTransform>( ) );
                 }
             }
         }
@@ -68,28 +81,35 @@ namespace EasySee.UI
         /// <summary>
         /// This is called when we need to refresh the positioning of the children.
         /// </summary>
-        public void CalculatePosition()
+        public void CalculatePosition ( )
         {
+            if(!m_Transform)
+                return;
+
             if (children == null || children.Count <= 0)
             {
-                Debug.Log("No Children to calculate position for.");
+                Debug.Log( "No Children to calculate position for." );
                 return;
             }
             float offset = 0;
-            foreach (RectTransform child in children)
+            foreach (RectTransform child in children.ToArray())
             {
                 if (child.gameObject.activeSelf)
                 {
+                    child.anchorMin = new Vector2( 0, 1 );
+                    child.anchorMax = new Vector2( 0, 1 );
 
-                    child.sizeDelta = new Vector2(transform.rect.width, child.rect.height);
+                    child.sizeDelta = new Vector2( m_Transform.rect.width, child.rect.height );
+                    
                     child.SetInsetAndSizeFromParentEdge( edgeToSnap, offset, childSize.y );
-                    child.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, childSize.x );
+                    child.anchoredPosition = new Vector2(m_Transform.rect.width/2, child.anchoredPosition.y );
+                    child.SetSizeWithCurrentAnchors( RectTransform.Axis.Horizontal, childSize.x );
                     offset += childSize.y + padding;
                 }
             }
             if (adjustSizeToContent)
             {
-                transform.sizeDelta = new Vector2( childSize.x , offset);
+                m_Transform.sizeDelta = new Vector2( m_Transform.sizeDelta.x, offset );
             }
         }
     }
