@@ -20,7 +20,7 @@ namespace EasySee.UI
         [SerializeField]
         bool adjustSizeToContent = false;
 
-        [SerializeField]
+        
         RectTransform.Edge edgeToSnap = RectTransform.Edge.Left;
 
 
