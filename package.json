@@ -1,0 +1,19 @@
+{
+  "name": "com.easysee.manual-layout-groups",
+  "version": "1.0.0",
+  "displayName": "Manual Layout Groups",
+  "description": "Manual Layout Groups for a more optimized UI where the canvas doesn't constantly get dirtied.",
+  "unity": "2019.1",
+  "dependencies": {},
+  "keywords": [
+    "ui",
+    "optimization",
+    "layout"
+  ],
+  "author": {
+    "name": "Jeroen van Dragt",
+    "email": "jeroen.van.dragt@gmail.com",
+    "url": "http://www.lone-birch.com"
+
+  }
+}
