@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace EasySee.UI
 {
-    [AddComponentMenu("UI/EasySee/ManualVerticalLayout")]
+    [AddComponentMenu("Layout/EasySee/ManualVerticalLayout")]
     public class LayoutVertical : MonoBehaviour
     {
         [SerializeField]
